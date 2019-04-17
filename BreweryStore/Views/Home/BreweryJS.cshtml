@@ -1,0 +1,123 @@
+﻿@model BreweryStore.Models.SearchKeyword
+@{
+    ViewBag.Title = "BreweryJS";
+}
+<script>
+    var inHTML = "";
+    var keyword = ""
+    $(document).ready(function () {
+        
+        $("#searchBTN").click(function (e) {
+            $("#KeyWord").empty();
+            $("ul#BreweryList").empty();
+            e.preventDefault();
+            if ($("#CityName").val() != '' && $("#KeyWord").val() != '') {
+                console.log("City and state API called");
+                $.ajax({
+                    url: "/Home/GetBreweryByNameAndState",
+                    type: "GET",
+                    dataType: "json",
+                    data: { name: $("#KeyWord").val(), stateName: $("#CityName").val() },
+                    success: function (data) {
+                        $.each(data, function (index, value) {
+                            var newItem = "<li><h3>" + value.name + "</h3><ul><li>" + value.phone + "</li><li>" + value.city + "</li><li>" + value.street + "</li><li>" + value.state + "</li></ul></li>"
+                            inHTML += newItem;
+                        });
+                        $("ul#BreweryList").html(inHTML);
+                    }
+                })
+            }
+            else if ($("#CityName").val() != '') {
+                console.log("city API called");
+                $.ajax({
+                    url: "/Home/GetBreweryByState",
+                    type: "GET",
+                    dataType: "json",
+                    data: { key: $("#CityName").val() },
+                    success: function (data) {
+                        console.log(data);
+                        $.each(data, function (index, value) {
+                            var newItem = "<li><h3>" + value.name + "</h3><ul><li>" + value.phone + "</li><li>" + value.city + "</li><li>" + value.street + "</li><li>" + value.state + "</li></ul></li>"
+                            inHTML += newItem;
+                        });
+                        $("ul#BreweryList").html(inHTML);
+                    }
+                })
+            }
+            else if ($("#KeyWord").val() != '') {
+                console.log("NAME API called");
+                $.ajax({
+                    url: "/Home/GetBreweryByName",
+                    type: "GET",
+                    dataType: "json",
+                    data: { key: $("#KeyWord").val() },
+                    success: function (data) {
+                        console.log(data);
+                        $('#breweryName').text(data[0].name);
+                        $('#city').text("City :" + data[0].city);
+                        $('#state').text("State :" + data[0].state);
+                        $('#zipcode').text("Zipcode :" + data[0].postal_code);
+                        $('#phone').text("PhoneNo :" + data[0].phone);
+                        $('#street').text("Street :" + data[0].street);
+                    }
+                })
+            }
+            
+        })
+        
+        $("#KeyWord").autocomplete({
+            source: function (request, response) {
+                $.ajax({
+                    url: "/Home/GetBrewery",
+                    type: "POST",
+                    dataType: "json",
+                    data: { key: request.term },
+                    success: function (data) {
+                        response($.map(data, function (item) {
+                            console.log(item);
+                            return { label: item.name, value: item.name };
+                        }))
+
+                    }
+                })
+            }
+        });
+    })
+
+
+</script>
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+
+<div class="form-horizontal">
+
+    <hr />
+
+    <div class="form-group">
+        <div class="col-md-4">
+            @Html.EditorFor(model => model.CityName, new { htmlAttributes = new { @class = "form-control City" , placeholder = "State Name" } })
+        </div>
+        <div class="col-md-4">
+            @Html.EditorFor(model => model.KeyWord, new { htmlAttributes = new { @class = "form-control City" , placeholder = "Brewery Name" } })
+
+        </div>
+        <div class="col-md-4 text-left">
+            <button class="btn" id="searchBTN">Search</button>
+        </div>
+    </div>
+    <ul id="BreweryList">
+        
+    </ul>
+    <div id="storeDetails">
+        <h3 id="breweryName"></h3>
+        <p id="phone"></p>
+        <p id="city"></p>
+        <p id="street"></p>
+        <p id="state"></p>
+        <p id="zipcode"></p>
+    </div>
+
+</div>
+}
+

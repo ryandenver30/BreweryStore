@@ -1,0 +1,35 @@
+﻿
+@{
+    ViewBag.Title = "BreweryJS";
+}
+
+<h2>BreweryJS</h2>
+<input id="cityName" type="search"  />
+
+<button>Search</button>
+
+<table id="dynamicTable"></table>
+
+<script>
+    var inHTML = "";
+    $(document).ready(function () {
+
+        $(".cityName").change(function () {
+            console.log($(".cityName").html);
+        });
+        $("button").click(function () {
+            $.get("@Url.Action("GetBrewery", "Home")", function (response) {
+                //response
+                console.log(response);
+                $.each(response.data, function (index, value) {
+                    var newItem = "<tr><td>" + value.name + "</td></tr>"
+                    inHTML += newItem;
+                });
+                $("table#dynamicTable").html(inHTML);
+            });
+        })
+    }
+
+    
+</script>
+
