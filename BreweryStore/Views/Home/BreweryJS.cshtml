@@ -9,7 +9,7 @@
         
         $("#searchBTN").click(function (e) {
             $("#KeyWord").empty();
-            $("ul#BreweryList").empty();
+            $("#BreweryList").empty();
             e.preventDefault();
             if ($("#CityName").val() != '' && $("#KeyWord").val() != '') {
                 console.log("City and state API called");
@@ -19,11 +19,18 @@
                     dataType: "json",
                     data: { name: $("#KeyWord").val(), stateName: $("#CityName").val() },
                     success: function (data) {
-                        $.each(data, function (index, value) {
-                            var newItem = "<li><h3>" + value.name + "</h3><ul><li>" + value.phone + "</li><li>" + value.city + "</li><li>" + value.street + "</li><li>" + value.state + "</li></ul></li>"
-                            inHTML += newItem;
-                        });
-                        $("ul#BreweryList").html(inHTML);
+                        $("#BreweryList").empty();
+                        if (data.length != 0) {
+                            $.each(data, function (index, value) {
+                                var newItem = "<li><h3>" + value.name + "</h3><ul><li>" + value.phone + "</li><li>" + value.city + "</li><li>" + value.street + "</li><li>" + value.state + "</li></ul></li>"
+                                inHTML += newItem;
+                            });
+                            $("ul#BreweryList").html(inHTML);
+                        }
+                        else {
+                            var error = "<h3>Sorry no Brewery found";
+                            $("ul#BreweryList").html(error);
+                        }
                     }
                 })
             }
@@ -36,11 +43,18 @@
                     data: { key: $("#CityName").val() },
                     success: function (data) {
                         console.log(data);
-                        $.each(data, function (index, value) {
-                            var newItem = "<li><h3>" + value.name + "</h3><ul><li>" + value.phone + "</li><li>" + value.city + "</li><li>" + value.street + "</li><li>" + value.state + "</li></ul></li>"
-                            inHTML += newItem;
-                        });
-                        $("ul#BreweryList").html(inHTML);
+                        $("#BreweryList").empty();
+                        if (data.length != 0) {
+                            $.each(data, function (index, value) {
+                                var newItem = "<li><h3>" + value.name + "</h3><ul><li>" + value.phone + "</li><li>" + value.city + "</li><li>" + value.street + "</li><li>" + value.state + "</li></ul></li>"
+                                inHTML += newItem;
+                            });
+                            $("ul#BreweryList").html(inHTML);
+                        }
+                        else {
+                            var error = "<h3>Sorry no Brewery found in " + $("#CityName").val() + " city";
+                            $("ul#BreweryList").html(error);
+                        }
                     }
                 })
             }
